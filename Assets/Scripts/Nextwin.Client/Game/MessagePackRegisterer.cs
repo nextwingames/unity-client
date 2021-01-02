@@ -125,8 +125,8 @@ namespace Nextwin.Client.Game
         private static bool CheckRegisterSuccess()
         {
             SerializableData serializingData = new SerializableData(255);
-            byte[] bytes = Serializer.Instance.Serialize(serializingData);
-            SerializableData deserializedData = Serializer.Instance.Deserialize<SerializableData>(bytes);
+            byte[] bytes = MessagePackSerializer.Serialize(serializingData);
+            SerializableData deserializedData = MessagePackSerializer.Deserialize<SerializableData>(bytes);
             
             if(serializingData.MsgType == deserializedData.MsgType)
             {
