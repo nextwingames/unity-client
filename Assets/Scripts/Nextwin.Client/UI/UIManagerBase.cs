@@ -8,9 +8,11 @@ namespace Nextwin.Client.UI
     /// <summary>
     /// UIManager의 base 추상 클래스, TEFrame과 TEDialog에 대응하는 enum을 정의해야함
     /// </summary>
+    /// <typeparam name="T">UIManagerBase를 상속받는 UIManager 클래스</typeparam>
     /// <typeparam name="TFrame">Frame 식별자</typeparam>
     /// <typeparam name="TDialog">Dialog 식별자</typeparam>
-    public abstract class UIManagerBase<TFrame, TDialog> : Singleton<UIManagerBase<TFrame, TDialog>> where TFrame : Enum where TDialog : Enum
+    public abstract class UIManagerBase<T, TFrame, TDialog> : Singleton<UIManagerBase<T, TFrame, TDialog>> 
+        where TFrame : Enum where TDialog : Enum where T : UIManagerBase<T, TFrame, TDialog>
     {
         protected Dictionary<TFrame, UIFrame<TFrame>> _frames;
         protected Dictionary<TDialog, UIDialog<TDialog>> _dialogs;

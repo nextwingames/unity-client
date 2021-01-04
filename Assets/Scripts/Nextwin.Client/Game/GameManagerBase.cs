@@ -1,19 +1,18 @@
 ﻿using Nextwin.Client.Protocol;
 using Nextwin.Client.Util;
 using Nextwin.Net;
-using Nextwin.Protocol;
-using System;
 using System.Threading;
 using UnityEngine;
 
 namespace Nextwin.Client.Game
 {
-    [RequireComponent(typeof(Serializer))]
-    [RequireComponent(typeof(NetworkThreadManager))]
     /// <summary>
     /// NetworkManager를 사용하여 서버와 통신하기 위한 GameManager의 상위 클래스
     /// </summary>
-    public abstract class GameManagerBase : Singleton<GameManagerBase>
+    /// <typeparam name="T">GameManagerBase를 상속받을 GameManager 클래스</typeparam>
+    [RequireComponent(typeof(Serializer))]
+    [RequireComponent(typeof(NetworkThreadManager))]
+    public abstract class GameManagerBase<T> : Singleton<T> where T : GameManagerBase<T>
     {
         protected NetworkManager _networkManager;
         protected Thread _networkThread;

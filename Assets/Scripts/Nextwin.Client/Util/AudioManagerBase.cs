@@ -6,9 +6,13 @@ using UnityEngine;
 namespace Nextwin.Client.Util
 {
     /// <summary>
-    /// 오디오 관리자, 모든 오디오클립의 이름은 고유해야함
+    /// 오디오 관리자, 모든 오디오의 이름은 동일해야 함
     /// </summary>
-    public abstract class AudioManagerBase<TAudioClip, TAudioSource> : Singleton<AudioManagerBase<TAudioClip, TAudioSource>> where TAudioClip : Enum where TAudioSource : Enum
+    /// <typeparam name="T">AudioManagerBase를 상속받는 AudioManager 클래스</typeparam>
+    /// <typeparam name="TAudioClip">오디오 클립 enum</typeparam>
+    /// <typeparam name="TAudioSource">오디오 소스 enum</typeparam>
+    public abstract class AudioManagerBase<T, TAudioClip, TAudioSource> : Singleton<AudioManagerBase<T, TAudioClip, TAudioSource>> 
+        where TAudioClip : Enum where TAudioSource : Enum where T : AudioManagerBase<T, TAudioClip, TAudioSource>
     {
         protected Dictionary<TAudioClip, AudioClip> _audioClips;
         [SerializeField, Header("Key: AudioSource layer / Value: AudioSource object")]

@@ -7,7 +7,14 @@ using UnityEngine.Video;
 
 namespace Nextwin.Client.Util
 {
-    public abstract class VideoManagerBase<TScreen, TVideoPlayer> : Singleton<VideoManagerBase<TScreen, TVideoPlayer>> where TScreen : Enum where TVideoPlayer : Enum
+    /// <summary>
+    /// 비디오 관리자
+    /// </summary>
+    /// <typeparam name="T">VideoManagerBase를 상속받을 VideoManager</typeparam>
+    /// <typeparam name="TScreen">스크린 enum</typeparam>
+    /// <typeparam name="TVideoPlayer">비디오 플레이어 enum</typeparam>
+    public abstract class VideoManagerBase<T, TScreen, TVideoPlayer> : Singleton<VideoManagerBase<T, TScreen, TVideoPlayer>> 
+        where TScreen : Enum where TVideoPlayer : Enum where T : VideoManagerBase<T, TScreen, TVideoPlayer>
     {
         public delegate void Callback();
 
