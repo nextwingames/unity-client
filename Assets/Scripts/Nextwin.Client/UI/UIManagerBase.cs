@@ -46,14 +46,14 @@ namespace Nextwin.Client.UI
         /// <summary>
         /// 모든 UI를 찾아 Dictionary에 추가한 후 비활성화
         /// </summary>
-        /// <typeparam name="T">UIBase의 하위 클래스</typeparam>
+        /// <typeparam name="TBase">UIBase의 하위 클래스</typeparam>
         /// <typeparam name="TUI">UIBase의 ID를 지정할 enum</typeparam>
         /// <param name="dic">UI를 담을 Dictionary</param>
-        protected virtual void FindUIs<T, TUI>(ref Dictionary<TUI, T> dic) where T : UIBase<TUI> where TUI : Enum
+        protected virtual void FindUIs<TBase, TUI>(ref Dictionary<TUI, TBase> dic) where TBase : UIBase<TUI> where TUI : Enum
         {
-            dic = new Dictionary<TUI, T>();
+            dic = new Dictionary<TUI, TBase>();
 
-            foreach(T ui in FindObjectsOfType(typeof(T)))
+            foreach(TBase ui in FindObjectsOfType(typeof(TBase)))
             {
                 if(dic.ContainsKey(ui.ID))
                 {

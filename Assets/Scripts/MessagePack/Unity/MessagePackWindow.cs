@@ -9,9 +9,19 @@ using UnityEngine;
 
 namespace MessagePack.Unity.Editor
 {
+    internal enum EOSPlatform
+    {
+        Window,
+        Unix
+    }
+
     internal class MessagePackWindow:EditorWindow
     {
         static MessagePackWindow window;
+        
+        public static EOSPlatform OS { get; private set; }
+        public static string Dotnet { get; private set; }
+        public static string Mpc { get; private set; }
 
         bool processInitialized;
 
@@ -38,6 +48,8 @@ namespace MessagePack.Unity.Editor
 
         async void OnEnable()
         {
+            CheckAndSetOS();
+
             window = this; // set singleton.
             try
             {
@@ -54,6 +66,26 @@ namespace MessagePack.Unity.Editor
             {
                 mpcArgument = MpcArgument.Restore();
                 processInitialized = true;
+            }
+        }
+
+        void CheckAndSetOS()
+        {
+            string osPlatform = Environment.OSVersion.Platform.ToString();
+
+            if(osPlatform.Contains("Win"))
+            {
+                OS = EOSPlatform.Window;
+
+                Dotnet = "dotnet";
+                Mpc = "mpc";
+            }
+            else if(osPlatform.Contains("Unix"))
+            {
+                OS = EOSPlatform.Unix;
+
+                Dotnet = "/usr/local/share/dotnet/dotnet";
+                Mpc = "/usr/local/share/dotnet/dotnet";
             }
         }
 
@@ -152,7 +184,7 @@ namespace MessagePack.Unity.Editor
                 {
                     ProcessHelper.ReadyForMessagePack();
 
-                    var log = await ProcessHelper.InvokeProcessStartAsync("mpc", commnadLineArguments);
+                    var log = await ProcessHelper.InvokeProcessStartAsync(Mpc, $"{(OS == EOSPlatform.Unix ? "mpc" : "")} commnadLineArguments");
                     UnityEngine.Debug.Log(log);
                 }
                 finally
@@ -242,7 +274,7 @@ namespace MessagePack.Unity.Editor
 
         public static async Task<bool> IsInstalledMpc()
         {
-            var list = await InvokeProcessStartAsync("dotnet", "tool list -g");
+            var list = await InvokeProcessStartAsync(MessagePackWindow.Dotnet, "tool list -g");
             if(list.Contains(InstallName))
             {
                 return true;
@@ -255,14 +287,14 @@ namespace MessagePack.Unity.Editor
 
         public static async Task<string> InstallMpc()
         {
-            return await InvokeProcessStartAsync("dotnet", "tool install --global " + InstallName);
+            return await InvokeProcessStartAsync(MessagePackWindow.Dotnet, "tool install --global " + InstallName);
         }
 
         public static async Task<(bool found, string version)> FindDotnetAsync()
         {
             try
             {
-                var version = await InvokeProcessStartAsync("dotnet", "--version");
+                var version = await InvokeProcessStartAsync(MessagePackWindow.Dotnet, "--version");
                 return (true, version);
             }
             catch
@@ -322,7 +354,7 @@ namespace MessagePack.Unity.Editor
 
             try
             {
-                ProcessStartInfo newToolManifest = CreateProcessStartInfo("dotnet.exe", "new tool-manifest", true);
+                ProcessStartInfo newToolManifest = CreateProcessStartInfo(MessagePackWindow.Dotnet, "new tool-manifest", true);
                 process = Process.Start(newToolManifest);
             }
             catch(Exception e)
@@ -333,7 +365,7 @@ namespace MessagePack.Unity.Editor
             try
             {
                 process.WaitForExit();
-                ProcessStartInfo toolInstall = CreateProcessStartInfo("dotnet.exe", "tool install MessagePack.Generator", true);
+                ProcessStartInfo toolInstall = CreateProcessStartInfo(MessagePackWindow.Dotnet, "tool install MessagePack.Generator", true);
                 process = Process.Start(toolInstall);
             }
             catch(Exception e)
@@ -344,7 +376,7 @@ namespace MessagePack.Unity.Editor
 
         private static bool IsConfigCreated()
         {
-            if(Dir().Contains(".config"))
+            if(GetDirectoryList().Contains(".config"))
             {
                 UnityEngine.Debug.Log("Config file exist.");
                 return true;
@@ -353,11 +385,29 @@ namespace MessagePack.Unity.Editor
             return false;
         }
 
-        private static string Dir()
+        private static string GetDirectoryList()
         {
+            string fileName, arguments;
+            if(MessagePackWindow.OS == EOSPlatform.Window)
+            {
+                fileName = "cmd";
+                arguments = "";
+            }
+            else if(MessagePackWindow.OS == EOSPlatform.Unix)
+            {
+                fileName = "/bin/bash";
+                arguments = "-c \"ls -a\"";
+            }
+            else
+            {
+                fileName = "";
+                arguments = "";
+            }
+
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = "CMD.exe",
+                FileName = fileName,
+                Arguments = arguments,
                 UseShellExecute = false,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
@@ -371,7 +421,10 @@ namespace MessagePack.Unity.Editor
             };
             process.Start();
 
-            process.StandardInput.Write("dir" + Environment.NewLine);
+            if(MessagePackWindow.OS == EOSPlatform.Window)
+            {
+                process.StandardInput.Write("dir" + Environment.NewLine);
+            }
             process.StandardInput.Close();
             string result = process.StandardOutput.ReadToEnd();
 
