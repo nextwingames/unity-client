@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace MessagePack.Unity.Editor
 {
-    internal class MessagePackWindow : EditorWindow
+    internal class MessagePackWindow:EditorWindow
     {
         static MessagePackWindow window;
 
@@ -27,7 +27,7 @@ namespace MessagePack.Unity.Editor
         [MenuItem("Window/MessagePack/CodeGenerator")]
         public static void OpenWindow()
         {
-            if (window != null)
+            if(window != null)
             {
                 window.Close();
             }
@@ -45,7 +45,7 @@ namespace MessagePack.Unity.Editor
                 isDotnetInstalled = dotnet.found;
                 dotnetVersion = dotnet.version;
 
-                if (isDotnetInstalled)
+                if(isDotnetInstalled)
                 {
                     isInstalledMpc = await ProcessHelper.IsInstalledMpc();
                 }
@@ -59,43 +59,43 @@ namespace MessagePack.Unity.Editor
 
         async void OnGUI()
         {
-            if (!processInitialized)
+            if(!processInitialized)
             {
                 GUILayout.Label("Check .NET Core SDK/CodeGen install status.");
                 return;
             }
-            if (mpcArgument == null)
+            if(mpcArgument == null)
             {
                 return;
             }
 
-            if (!isDotnetInstalled)
+            if(!isDotnetInstalled)
             {
                 GUILayout.Label(".NET Core SDK not found.");
                 GUILayout.Label("MessagePack CodeGen requires .NET Core Runtime.");
-                if (GUILayout.Button("Open .NET Core install page."))
+                if(GUILayout.Button("Open .NET Core install page."))
                 {
                     Application.OpenURL("https://dotnet.microsoft.com/download");
                 }
                 return;
             }
 
-            if (!isInstalledMpc)
+            if(!isInstalledMpc)
             {
                 GUILayout.Label("MessagePack CodeGen does not installed.");
                 EditorGUI.BeginDisabledGroup(installingMpc);
 
-                if (GUILayout.Button("Install MessagePack CodeGen."))
+                if(GUILayout.Button("Install MessagePack CodeGen."))
                 {
                     installingMpc = true;
                     try
                     {
                         var log = await ProcessHelper.InstallMpc();
-                        if (!string.IsNullOrWhiteSpace(log))
+                        if(!string.IsNullOrWhiteSpace(log))
                         {
                             UnityEngine.Debug.Log(log);
                         }
-                        if (log != null && log.Contains("error"))
+                        if(log != null && log.Contains("error"))
                         {
                             isInstalledMpc = false;
                         }
@@ -123,7 +123,7 @@ namespace MessagePack.Unity.Editor
 
             EditorGUILayout.LabelField("-m(optional) use map mode:");
             var newToggle = EditorGUILayout.Toggle(mpcArgument.UseMapMode);
-            if (mpcArgument.UseMapMode != newToggle)
+            if(mpcArgument.UseMapMode != newToggle)
             {
                 mpcArgument.UseMapMode = newToggle;
                 mpcArgument.Save();
@@ -142,7 +142,7 @@ namespace MessagePack.Unity.Editor
             TextField(mpcArgument, x => x.MultipleIfDirectiveOutputSymbols, (x, y) => x.MultipleIfDirectiveOutputSymbols = y);
 
             EditorGUI.BeginDisabledGroup(invokingMpc);
-            if (GUILayout.Button("Generate"))
+            if(GUILayout.Button("Generate"))
             {
                 var commnadLineArguments = mpcArgument.ToString();
                 UnityEngine.Debug.Log("Generate MessagePack Files, command:" + commnadLineArguments);
@@ -150,6 +150,8 @@ namespace MessagePack.Unity.Editor
                 invokingMpc = true;
                 try
                 {
+                    ProcessHelper.ReadyForMessagePack();
+
                     var log = await ProcessHelper.InvokeProcessStartAsync("mpc", commnadLineArguments);
                     UnityEngine.Debug.Log(log);
                 }
@@ -165,7 +167,7 @@ namespace MessagePack.Unity.Editor
         {
             var current = getter(args);
             var newValue = EditorGUILayout.TextField(current);
-            if (newValue != current)
+            if(newValue != current)
             {
                 setter(args, newValue);
                 args.Save();
@@ -187,7 +189,7 @@ namespace MessagePack.Unity.Editor
 
         public static MpcArgument Restore()
         {
-            if (EditorPrefs.HasKey(Key))
+            if(EditorPrefs.HasKey(Key))
             {
                 var json = EditorPrefs.GetString(Key);
                 return JsonUtility.FromJson<MpcArgument>(json);
@@ -209,23 +211,23 @@ namespace MessagePack.Unity.Editor
             var sb = new StringBuilder();
             sb.Append("-i "); sb.Append(Input);
             sb.Append(" -o "); sb.Append(Output);
-            if (!string.IsNullOrWhiteSpace(ConditionalSymbol))
+            if(!string.IsNullOrWhiteSpace(ConditionalSymbol))
             {
                 sb.Append(" -c "); sb.Append(ConditionalSymbol);
             }
-            if (!string.IsNullOrWhiteSpace(ResolverName))
+            if(!string.IsNullOrWhiteSpace(ResolverName))
             {
                 sb.Append(" -r "); sb.Append(ResolverName);
             }
-            if (UseMapMode)
+            if(UseMapMode)
             {
                 sb.Append(" -m");
             }
-            if (!string.IsNullOrWhiteSpace(Namespace))
+            if(!string.IsNullOrWhiteSpace(Namespace))
             {
                 sb.Append(" -n "); sb.Append(Namespace);
             }
-            if (!string.IsNullOrWhiteSpace(MultipleIfDirectiveOutputSymbols))
+            if(!string.IsNullOrWhiteSpace(MultipleIfDirectiveOutputSymbols))
             {
                 sb.Append(" -ms "); sb.Append(MultipleIfDirectiveOutputSymbols);
             }
@@ -241,7 +243,7 @@ namespace MessagePack.Unity.Editor
         public static async Task<bool> IsInstalledMpc()
         {
             var list = await InvokeProcessStartAsync("dotnet", "tool list -g");
-            if (list.Contains(InstallName))
+            if(list.Contains(InstallName))
             {
                 return true;
             }
@@ -290,7 +292,7 @@ namespace MessagePack.Unity.Editor
             {
                 p = Process.Start(psi);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 return Task.FromException<string>(ex);
             }
@@ -307,6 +309,87 @@ namespace MessagePack.Unity.Editor
             };
 
             return tcs.Task;
+        }
+
+        public static void ReadyForMessagePack()
+        {
+            if(IsConfigCreated())
+            {
+                return;
+            }
+
+            Process process = null;
+
+            try
+            {
+                ProcessStartInfo newToolManifest = CreateProcessStartInfo("dotnet.exe", "new tool-manifest", true);
+                process = Process.Start(newToolManifest);
+            }
+            catch(Exception e)
+            {
+                UnityEngine.Debug.LogError(e.ToString());
+            }
+
+            try
+            {
+                process.WaitForExit();
+                ProcessStartInfo toolInstall = CreateProcessStartInfo("dotnet.exe", "tool install MessagePack.Generator", true);
+                process = Process.Start(toolInstall);
+            }
+            catch(Exception e)
+            {
+                UnityEngine.Debug.LogError(e.ToString());
+            }
+        }
+
+        private static bool IsConfigCreated()
+        {
+            if(Dir().Contains(".config"))
+            {
+                UnityEngine.Debug.Log("Config file exist.");
+                return true;
+            }
+            UnityEngine.Debug.Log("There is no config file. Creating it starts.");
+            return false;
+        }
+
+        private static string Dir()
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "CMD.exe",
+                UseShellExecute = false,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            Process process = new Process
+            {
+                EnableRaisingEvents = false,
+                StartInfo = startInfo
+            };
+            process.Start();
+
+            process.StandardInput.Write("dir" + Environment.NewLine);
+            process.StandardInput.Close();
+            string result = process.StandardOutput.ReadToEnd();
+
+            process.WaitForExit(); 
+            process.Close();
+            UnityEngine.Debug.Log(result);
+            return result;
+        }
+
+        private static ProcessStartInfo CreateProcessStartInfo(string fileName, string arguments, bool useShellExecute = false, bool redirectStandardOutput = false)
+        {
+            return new ProcessStartInfo()
+            {
+                FileName = fileName,
+                Arguments = arguments,
+                UseShellExecute = useShellExecute,
+                RedirectStandardOutput = redirectStandardOutput
+            };
         }
     }
 }
