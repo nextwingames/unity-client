@@ -184,7 +184,7 @@ namespace MessagePack.Unity.Editor
                 {
                     ProcessHelper.ReadyForMessagePack();
 
-                    var log = await ProcessHelper.InvokeProcessStartAsync(Mpc, $"{(OS == EOSPlatform.Unix ? "mpc" : "")} commnadLineArguments");
+                    var log = await ProcessHelper.InvokeProcessStartAsync(Mpc, $"{(OS == EOSPlatform.Unix ? "mpc" : "")} {commnadLineArguments}");
                     UnityEngine.Debug.Log(log);
                 }
                 finally
