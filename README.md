@@ -22,7 +22,7 @@ using System.Collections.Generic;
 
 // 전송 데이터 패킷임을 표시하기 위해 [MessagePackObject]를 붙여줍니다.
 [MessagePackObject]
-public class Packet : SerializableData
+public class PacketExample : SerializableData
 {
     // 직렬화할 필드 변수 위에 [Key(n)]을 작성합니다. Key는 1번부터 시작하세요.
     [Key(1)]
