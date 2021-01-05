@@ -14,7 +14,9 @@
 - [Nextwin.Client.Util](#nextwinclientutil)
 
 ## MessagePack
-서버와 통신할 때 데이터를 직렬화, 역직렬화 하기 위해 사용되는 라이브러리입니다. 우선 프레임워크에 종속적인 데이터 패킷 클래스(서버와 주고 받기 위해 직렬화할 클래스)를 만들기 위해 다음과 같이 [Nextwin.Client.Protocol.SerailizableData]를 상속받는 클래스를 생성합니다.
+서버와 통신할 때 데이터를 직렬화, 역직렬화 하기 위해 사용되는 라이브러리입니다. 
+### 데이터 패킷 클래스 정의
+우선 프레임워크에 종속적인 데이터 패킷 클래스(서버와 주고 받기 위해 직렬화할 클래스)를 만들기 위해 다음과 같이 [Nextwin.Client.Protocol.SerailizableData]를 상속받는 클래스를 생성합니다.
 ```C#
 using MessagePack;
 using Nextwin.Client.Protocol;
@@ -41,6 +43,7 @@ public class PacketExample : SerializableData
 }
 ```
 
+### 직렬화 및 역직렬화를 위한 코드 자동 생성
 다음 작업은 데이터 패킷 클래스가 추가된 후 빌드나 유니티 에디터에서 실행시키기 전에 반드시 수행되어야 합니다. 우선 [.NET Core 3.1버전을 설치](https://dotnet.microsoft.com/download)하세요. cmd나 터미널에서 ```dotnet -v``` 명령어를 통해 설치된 .NET 버전을 확인할 수 있습니다. 유니티 실행 시에는 동적으로 코드를 생성할 수 없기 때문에 데이터 패킷 클래스가 추가될때마다 다음 절차를 반드시 수행해주세요.
 
 기타 자세한 내용은 [MessagePack-CSharp.git](https://github.com/neuecc/MessagePack-CSharp.git)을 참고하세요.
