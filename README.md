@@ -152,6 +152,6 @@ GameManagerBase를 상속받은 GameManager는 [Singleton](#singleton) 객체입
 ```C#
 // 직렬화
 byte[] bytes = Serializer.Instance.Serialize(packetExample1);
-// 
+// 역직렬화
 PacketExample packetExample2 = Serializer.Instance.Deserialize<PacketExample>(bytes);
 ```
