@@ -150,6 +150,8 @@ GameManagerBase를 상속받은 GameManager는 [Singleton](#singleton) 객체입
 ### Serializer
 [Singleton](#singleton) 객체로 Nextwin.Protocol.ISerializer 인터페이스를 구현합니다. 데이터를 직렬화하고 역직렬화 하는 방법은 다음과 같습니다.
 ```C#
+// 직렬화
 byte[] bytes = Serializer.Instance.Serialize(packetExample1);
+// 
 PacketExample packetExample2 = Serializer.Instance.Deserialize<PacketExample>(bytes);
 ```
