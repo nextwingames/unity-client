@@ -155,3 +155,56 @@ byte[] bytes = Serializer.Instance.Serialize(packetExample1);
 // 역직렬화
 PacketExample packetExample2 = Serializer.Instance.Deserialize<PacketExample>(bytes);
 ```
+
+## Nextwin.Client.UI
+### UIManagerBase
+UI를 관리합니다. 추상 클래스이기 때문에 UIManagerBase를 상속받은 UIManager 클래스를 정의해주어야 합니다. 마찬가지로 UIManagerBase도 [Singleton](#singleton) 객체입니다. 다음은 UIManagerBase를 상속받은 UIManager 클래스 작성 예시입니다.
+```C#
+using Nextwin.Client.UI;
+
+public enum EFrame
+{
+    Frame1,
+    Frame2,
+    Frame3
+}
+
+public enum EDialog
+{
+    Dialog1,
+    Dialog2,
+    Dialog3
+}
+
+public class UIManager : UIManagerBase<UIManager, EFrame, EDialog>
+{
+}
+```
+UIManagerBase에 3가지 타입 파라미터를 전달해야합니다. 첫번째 인자는 UIManagerBase를 상속받는 클래스, 두번째 인자는 [Frame](#uiframe)에 대한 enum, 세번째 인자는 [Dialog](#uidialog)에 대한 enum입니다. 두번째와 세번째 타입 파라미터를 UIManager 클래스 위에 EFrame과 EDialog라고 정의하였으며 이 enum의 멤버들은 [Frame](#uiframe)이나 [Dialog](#uidialog)를 식별하는 키가 됩니다.
+
+UIManagerBase를 상속받은 이 UIManager를 씬 내의 게임 오브젝트의 Component로 붙여 활성화하면 어플리케이션 실행 시 모든 UI를 즉, [Frame](#uiframe)과 [Dialog](#uidialog)를(모든 UI는 Frame이나 Dialog로 관리되어야 합니다.) 비활성화 상태로 만듭니다.
+
+### UIFrame
+다양한 UI Component들로 구성된 하나의 전체 화면입니다. UIManager를 통해 관리됩니다. 화면 전환을 쉽게 구현할 수 있습니다. 먼저 UIFrame을 상속받은 클래스를 다음과 같이 정의합니다.
+```C#
+using Nextwin.Client.UI;
+
+// UIManager에서 정의한 enum인 EFrame을 타입 파라미터로 전달하였습니다.
+public class UIFrameExample : UIFrame<EFrame>
+{
+}
+```
+타입 파라미터로 전달된 EFrame은 반드시 UIManagerBase에 타입 파라미터로 전달한 두번째 파라미터와 같아야 합니다.
+
+Canvas 아래에 Image 혹은 Panel을 추가하고 화면에 꽉 차도록 만듭니다. 그리고 추가한 오브젝트에 위에서 새로 정의한 클래스인 UIFrameExample을 추가합니다.
+
+<img src="https://user-images.githubusercontent.com/44297538/103796411-7e52da00-508a-11eb-9cf7-9c5d09a37711.png" width="60%" height="60%" title="hi2" alt="hi2"></img>
+
+"Id"와 "Show Speed Rate"를 조정할 수 있습니다. "Id"는 UIManager에서 UIFrame을 상속받은 다양한 클래스들을 식별하여 관리할 수 있도록 합니다. UIManagerBase에 전달한 두번째 타입 파라미터이자 UIFrame에 전달한 타입 파라미터, 위의 예제에서는 EFrame에 정의한 멤버 요소들이 표시됩니다. 위의 예제에서는 해당 Frame의 "Id"를 Frame1으로 설정하였습니다. "Show Speed Rate"의 값을 올리면 Frame이 나타나거나 사라질 때 더 빠른 속도로 전환됩니다. 이렇게 두가지 클래스를 정의하고 UI 오브젝트에 Component로 붙이게 되면 아래의 코드를 통해 다음 기능을 구현할 수 있습니다.
+```C#
+// Frame1이라는 Id를 가진 UIFrame을 활성화합니다.
+UIManager.Instance.GetFrame(EFrame.Frame1).Show();
+// Frame1이라는 Id를 가진 UIFrmae을 비활성화합니다.
+UIManager.Instance.GetFrame(EFrame.Frame1).Show(false);
+```
+![11](https://user-images.githubusercontent.com/44297538/103798264-cd017380-508c-11eb-9303-fca8617e92d7.gif)
