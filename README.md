@@ -208,3 +208,29 @@ UIManager.Instance.GetFrame(EFrame.Frame1).Show();
 UIManager.Instance.GetFrame(EFrame.Frame1).Show(false);
 ```
 ![11](https://user-images.githubusercontent.com/44297538/103798264-cd017380-508c-11eb-9303-fca8617e92d7.gif)
+
+### UIDialog
+대회상자 UI입니다. UIFrame과 마찬가지로 UIManager를 통해 관리되며 대화상자를 열고 닫는 등의 효과를 쉽게 구현할 수 있습니다. 사용 방법은 UIFrame과 거의 동일합니다.
+```C#
+using Nextwin.Client.UI;
+
+// UIManager에서 정의한 enum인 EFrame을 타입 파라미터로 전달하였습니다.
+public class UIDialogExample : UIDialog<EDialog>
+{
+}
+```
+마찬가지로 타입 파라미터로 전달된 EDialog는 반드시 UIManagerBase에 타입 파라미터로 전달한 세번째 파라미터와 같아야 합니다.
+
+Canvas에 Dialog를 만들기 위한 Image를 추가하고 Component로 UIDialogExample을 추가합니다.
+
+<img src="https://user-images.githubusercontent.com/44297538/104088579-61492180-52ab-11eb-9be6-04992e688fb5.png" width="60%" height="60%" title="di" alt="di"></img>
+
+UIFrame과 사용방법이 같습니다. "Id"에는 UIManagerBase에 전달한 세번째 타입 파라미터이자 UIDialog에 전달한 타입 파라미터인 EDialog에 정의한 멤버 요소들이 표시됩니다. UIManager를 통해 UIDialog를 보이거나 사라지게 할 수 있습니다.
+```C#
+// Dialog1이라는 Id를 가진 UIDialog을 활성화합니다.
+UIManager.Instance.GetDialog(EDialog.Dialog1).Show();
+// Dialog1이라는 Id를 가진 UIFrmae을 비활성화합니다.
+UIManager.Instance.GetDialog(EDialog.Dialog1).Show(false);
+```
+
+![2](https://user-images.githubusercontent.com/44297538/104089466-a290ff80-52b2-11eb-91b8-2cf05c62d9eb.gif)
