@@ -131,6 +131,7 @@ namespace Nextwin.Client.UI
             shadeRect.SetParent(transform);
             shadeRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rect.rect.width);
             shadeRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rect.rect.height);
+            shadeRect.transform.localScale = new Vector3(1, 1, 1);
 
             _shadeImage = _shadeImageObject.GetComponent<Image>();
             _shadeImage.color = new Color(0, 0, 0, 0);
